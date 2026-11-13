@@ -1,0 +1,88 @@
+﻿# Historical source backups
+**/*-before-*.js
+**/*-before-*.jsx
+**/*-before-*.css
+**/*-backup*.js
+**/*-backup*.jsx
+**/*-backup*.css
+**/backups/
+
+# Inspection and diagnostic output
+**/*-inspect.txt
+**/*-inspect.json
+**/*-response.json
+**/exchange-data/*.txt
+
+# Downloaded exchange source data
+**/exchange-data/*.csv
+**/exchange-data/*.json
+
+# Temporary review artifacts
+**/financial-display-inspect.txt
+**/prediction-route.js.txt
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+dist-ssr/
+**/dist/
+backend/target/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Backups
+*.bak
+*.backup*
+*.before-*
+*.sql
+
+# Local databases and sensitive exports
+*.sqlite
+*.sqlite3
+*.db
+*-response.json
+stockai-debug.log
+
+# Source data and downloaded financial documents
+*-source.xml
+*_filing.xml
+*_filing.html
+*-annual-report-*.pdf
+
+# Editor files
+.vscode/
+.idea/
+.DS_Store
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Legacy Java backend
+/backend/
+
+# Duplicate nested frontend
+/server/client/
+
+# Obsolete root-level files
+/App-checkpoint-working.jsx
+/server.js
+
+# Generated fundamentals review and preview data
+/server/*-preview*.json
+/server/*-review*.json
+/server/*-approved-symbols*.json
+/server/nse-be-bz-preview.json
