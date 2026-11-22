@@ -619,10 +619,10 @@ function DataPanel({ title, data, kind }) {
                   ).toFixed(4),
                   "Reported Previous EPS": yoy.epsAdjustment.reportedPreviousEPS == null
                     ? "Unavailable"
-                    : `â‚¹${Number(yoy.epsAdjustment.reportedPreviousEPS).toFixed(2)}`,
+                    : `₹${Number(yoy.epsAdjustment.reportedPreviousEPS).toFixed(2)}`,
                   "Adjusted Previous EPS": yoy.epsAdjustment.adjustedPreviousEPS == null
                     ? "Unavailable"
-                    : `â‚¹${Number(yoy.epsAdjustment.adjustedPreviousEPS).toFixed(2)}`
+                    : `₹${Number(yoy.epsAdjustment.adjustedPreviousEPS).toFixed(2)}`
                 }} />
 
                 {yoy.epsAdjustment.status === "NO_VERIFIED_CORPORATE_ACTIONS" && (
@@ -645,7 +645,7 @@ function DataPanel({ title, data, kind }) {
                     >
                       <p style={{ margin: "0 0 6px" }}>
                         <strong>{action.actionType || "Corporate action"}</strong>
-                        {" â€” "}
+                        {" — "}
                         Ratio: {action.ratioNumerator}:{action.ratioDenominator}
                       </p>
                       <p style={{ fontSize: 13, color: "#94a3b8", margin: "4px 0" }}>
@@ -760,7 +760,7 @@ function DataPanel({ title, data, kind }) {
                     rel="noreferrer"
                     style={{ color: "#60a5fa" }}
                   >
-                    View Original Financial Filing â†—
+                    View Original Financial Filing ↗
                   </a>
                 </p>
               )}
@@ -2464,7 +2464,7 @@ export default function App() {
             >
               {paginatedCorporateActions.length > 0 && paginatedCorporateActions.every((action) => expandedCorporateActionIds.includes(action.id)) ? "Collapse All" : "Expand All"}
             </button>
-            <div title="Review coverage = (Verified + Rejected) / Total Actions Ã— 100. Pending actions are not counted as reviewed." style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 8, background: corporateActionReviewStatus === "All actions reviewed" ? "rgba(34, 197, 94, 0.08)" : corporateActionReviewStatus === "Review not started" ? "rgba(245, 158, 11, 0.08)" : corporateActionReviewStatus === "Review in progress" ? "rgba(56, 189, 248, 0.08)" : "rgba(148, 163, 184, 0.08)", border: `1px solid ${corporateActionReviewStatus === "All actions reviewed" ? "rgba(34, 197, 94, 0.2)" : corporateActionReviewStatus === "Review not started" ? "rgba(245, 158, 11, 0.2)" : corporateActionReviewStatus === "Review in progress" ? "rgba(56, 189, 248, 0.2)" : "rgba(148, 163, 184, 0.2)"}` }}>
+            <div title="Review coverage = (Verified + Rejected) / Total Actions × 100. Pending actions are not counted as reviewed." style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 8, background: corporateActionReviewStatus === "All actions reviewed" ? "rgba(34, 197, 94, 0.08)" : corporateActionReviewStatus === "Review not started" ? "rgba(245, 158, 11, 0.08)" : corporateActionReviewStatus === "Review in progress" ? "rgba(56, 189, 248, 0.08)" : "rgba(148, 163, 184, 0.08)", border: `1px solid ${corporateActionReviewStatus === "All actions reviewed" ? "rgba(34, 197, 94, 0.2)" : corporateActionReviewStatus === "Review not started" ? "rgba(245, 158, 11, 0.2)" : corporateActionReviewStatus === "Review in progress" ? "rgba(56, 189, 248, 0.2)" : "rgba(148, 163, 184, 0.2)"}` }}>
               <span style={{ fontSize: 11, color: "#94a3b8" }}>Review Progress</span>
               <strong style={{ fontSize: 12, color: corporateActionReviewStatus === "All actions reviewed" ? "#22c55e" : corporateActionReviewStatus === "Review not started" ? "#f59e0b" : corporateActionReviewStatus === "Review in progress" ? "#38bdf8" : "#94a3b8" }}>{corporateActionVerificationCoverage}%</strong>
               <span style={{ fontSize: 11, color: "#94a3b8" }}>({corporateActionReviewedCount}/{corporateActionCounts.total} reviewed)</span>
@@ -2531,7 +2531,7 @@ export default function App() {
             <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 8 }}>
               Sorted by: <strong style={{ color: "#e2e8f0" }}>
                 {corporateActionsSort.startsWith("ANNOUNCEMENT") ? "Announcement Date" : "Effective Date"}
-                {" â€” "}
+                {" — "}
                 {corporateActionsSort.endsWith("OLDEST") ? "Oldest First" : "Newest First"}
               </strong>
             </p>
@@ -2602,17 +2602,17 @@ export default function App() {
                       <td>
                         {action.announcementDate
                           ? new Date(action.announcementDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })
-                          : "â€”"}
+                          : "—"}
                       </td>
                       <td>
                         {action.recordDate
                           ? new Date(action.recordDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })
-                          : "â€”"}
+                          : "—"}
                       </td>
                       <td>
                         {action.effectiveDate
                           ? new Date(action.effectiveDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })
-                          : "â€”"}
+                          : "—"}
                       </td>
                       <td>
                         <span style={{
@@ -2687,7 +2687,7 @@ export default function App() {
                               border: "1px solid #334155"
                             }}>
                               <h3 style={{ margin: "0 0 14px", fontSize: 16 }}>
-                                Corporate Action Details â€” {action.symbol}
+                                Corporate Action Details — {action.symbol}
                               </h3>
                               <div style={{
                                 display: "grid",
@@ -2704,15 +2704,15 @@ export default function App() {
                                 </div>
                                 <div>
                                   <strong>Announcement Date</strong>
-                                  <p>{action.announcementDate ? new Date(action.announcementDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "â€”"}</p>
+                                  <p>{action.announcementDate ? new Date(action.announcementDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"}</p>
                                 </div>
                                 <div>
                                   <strong>Record Date</strong>
-                                  <p>{action.recordDate ? new Date(action.recordDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "â€”"}</p>
+                                  <p>{action.recordDate ? new Date(action.recordDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"}</p>
                                 </div>
                                 <div>
                                   <strong>Effective Date</strong>
-                                  <p>{action.effectiveDate ? new Date(action.effectiveDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "â€”"}</p>
+                                  <p>{action.effectiveDate ? new Date(action.effectiveDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"}</p>
                                 </div>
                                 <div>
                                   <strong>Verification Status</strong>
@@ -2768,9 +2768,9 @@ export default function App() {
                                       `Company: ${action.symbol}`,
                                       `Action Type: ${action.actionType}`,
                                       `Ratio: ${action.ratioNumerator}:${action.ratioDenominator}`,
-                                      `Announcement Date: ${action.announcementDate ? new Date(action.announcementDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "â€”"}`,
-                                      `Record Date: ${action.recordDate ? new Date(action.recordDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "â€”"}`,
-                                      `Effective Date: ${action.effectiveDate ? new Date(action.effectiveDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "â€”"}`,
+                                      `Announcement Date: ${action.announcementDate ? new Date(action.announcementDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"}`,
+                                      `Record Date: ${action.recordDate ? new Date(action.recordDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"}`,
+                                      `Effective Date: ${action.effectiveDate ? new Date(action.effectiveDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }) : "—"}`,
                                       `Verification Status: ${action.verificationStatus || "UNKNOWN"}`,
                                       `Source Name: ${action.sourceName || "Unavailable"}`,
                                       `Source URLs: ${String(action.sourceUrl || "").split(/\s+/).filter(Boolean).join(", ") || "Unavailable"}`
