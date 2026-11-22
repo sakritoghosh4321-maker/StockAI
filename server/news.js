@@ -1,5 +1,6 @@
-﻿
+
 const express = require("express");
+const pool = require("./db");
 
 const router = express.Router();
 
@@ -193,13 +194,65 @@ async function sendNews(req, res) {
 
 router.get("/", sendNews);
 
+async function resolveNewsQuery(rawQuery) {
+  const originalQuery = String(rawQuery || "Indian stock market")
+    .trim()
+    .slice(0, 100);
+
+  const match = originalQuery.match(/(?:^|\s)([A-Z0-9&.-]+)$/i);
+
+  if (!match) {
+    return {
+      company_name: null,
+      symbol: null,
+      query: originalQuery,
+    };
+  }
+
+  const symbol = match[1].toUpperCase();
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT company_name, symbol
+       FROM exchange_directory
+       WHERE UPPER(symbol) = ?
+       ORDER BY CASE WHEN exchange = 'NSE' THEN 0 ELSE 1 END
+       LIMIT 1`,
+      [symbol]
+    );
+
+    if (!rows.length || !rows[0].company_name) {
+      return {
+        company_name: null,
+        symbol: null,
+        query: originalQuery,
+      };
+    }
+
+    const companyName = String(rows[0].company_name)
+      .replace(/"/g, "")
+      .trim();
+
+    return {
+      company_name: companyName,
+      symbol: rows[0].symbol,
+      query: `"${companyName}" ${rows[0].symbol}`,
+    };
+  } catch (error) {
+    console.error("News company lookup failed:", error.message);
+
+    return {
+      company_name: null,
+      symbol: null,
+      query: originalQuery,
+    };
+  }
+}
+
 router.get("/sentiment", async (req, res) => {
   try {
-    const query = String(req.query.q || "Indian stock market")
-      .trim()
-      .slice(0, 100);
-
-    const news = await getLiveNews(query);
+    const resolved = await resolveNewsQuery(req.query.q);
+    const news = await getLiveNews(resolved.query);
 
     if (!news.length) throw new Error("No headlines available.");
 
@@ -215,6 +268,34 @@ router.get("/sentiment", async (req, res) => {
     const overallSentiment =
       averageScore > 0.15 ? "Positive" :
       averageScore < -0.15 ? "Negative" : "Neutral";
+
+    // Save company-specific snapshots without blocking live sentiment.
+    if (resolved.symbol) {
+      try {
+        await pool.execute(
+          `INSERT INTO sentiment_history
+            (symbol, company_name, overall_sentiment, average_score,
+             total_news, positive_count, neutral_count, negative_count, source)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            resolved.symbol,
+            resolved.company_name,
+            overallSentiment,
+            Number(averageScore.toFixed(2)),
+            news.length,
+            positive,
+            neutral,
+            negative,
+            "Google News RSS",
+          ]
+        );
+      } catch (saveError) {
+        console.error(
+          "Sentiment history save failed:",
+          saveError.message
+        );
+      }
+    }
 
     res.json({
       status: "success",
@@ -247,6 +328,56 @@ router.get("/sentiment", async (req, res) => {
   }
 });
 
+router.get("/sentiment/history", async (req, res) => {
+  try {
+    const resolved = await resolveNewsQuery(req.query.q);
+
+    if (!resolved.symbol) {
+      return res.json({
+        status: "success",
+        symbol: null,
+        companyName: null,
+        history: [],
+      });
+    }
+
+    const parsedLimit = Number.parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(parsedLimit)
+      ? Math.min(100, Math.max(1, parsedLimit))
+      : 30;
+
+    const [rows] = await pool.execute(
+      `SELECT
+         id,
+         symbol,
+         company_name,
+         overall_sentiment,
+         average_score,
+         total_news,
+         positive_count,
+         neutral_count,
+         negative_count,
+         source,
+         analyzed_at
+       FROM sentiment_history
+       WHERE symbol = ?
+       ORDER BY analyzed_at DESC
+       LIMIT ?`,
+      [resolved.symbol, limit]
+    );
+
+    res.json({
+      status: "success",
+      symbol: resolved.symbol,
+      companyName: resolved.company_name,
+      history: rows,
+    });
+  } catch (error) {
+    console.error("Sentiment history retrieval failed:", error.message);
+    res.status(500).json({
+      status: "error",
+      message: "Unable to retrieve sentiment history.",
+    });
+  }
+});
 module.exports = router;
-
-
