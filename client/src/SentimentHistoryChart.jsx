@@ -17,17 +17,22 @@ export default function SentimentHistoryChart({
   error,
   onRefresh,
 }) {
-  const chartData = history.map((item) => ({
-    ...item,
-    score: Number(item.average_score),
-    date: new Date(item.analyzed_at).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-  }));
-
+    const chartData = [...history]
+    .sort(
+      (a, b) =>
+        new Date(a.analyzed_at).getTime() -
+        new Date(b.analyzed_at).getTime()
+    )
+    .map((item) => ({
+      ...item,
+      score: Number(item.average_score),
+      date: new Date(item.analyzed_at).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    }));
   const latest = chartData[chartData.length - 1];
   const previous =
     chartData.length >= 2 ? chartData[chartData.length - 2] : null;
