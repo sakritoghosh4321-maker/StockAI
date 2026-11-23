@@ -2,6 +2,7 @@
 import { Fragment, lazy, Suspense, useEffect, useState } from "react";
 import "./App.css";
 const StockChart = lazy(() => import("./StockChart"));
+const SentimentHistoryChart = lazy(() => import("./SentimentHistoryChart"));
 
 const API = "http://localhost:5000";
 
@@ -817,6 +818,9 @@ export default function App() {
   const [sentiment, setSentiment] = useState(null);
   const [sentimentLoading, setSentimentLoading] = useState(false);
   const [sentimentError, setSentimentError] = useState("");
+  const [sentimentHistory, setSentimentHistory] = useState([]);
+  const [sentimentHistoryLoading, setSentimentHistoryLoading] = useState(false);
+  const [sentimentHistoryError, setSentimentHistoryError] = useState("");
   const [newsFilter, setNewsFilter] = useState("market");
   const [listingExchange, setListingExchange] = useState("NSE");
   const [listingSearch, setListingSearch] = useState("BEL");
@@ -1312,6 +1316,29 @@ export default function App() {
     corporateActionsPageSize
   ]);
 
+  async function loadSentimentHistory(symbol = selected) {
+    if (!symbol) return;
+
+    setSentimentHistoryLoading(true);
+    setSentimentHistoryError("");
+
+    try {
+      const result = await request(
+        `/api/news/sentiment/history?q=${encodeURIComponent(symbol)}&limit=30`
+      );
+
+      setSentimentHistory(
+        Array.isArray(result?.history) ? result.history : []
+      );
+    } catch (err) {
+      setSentimentHistoryError(
+        err.message || "Unable to load sentiment history."
+      );
+    } finally {
+      setSentimentHistoryLoading(false);
+    }
+  }
+
       async function loadSentiment() {
     setSentimentLoading(true);
     setSentimentError("");
@@ -1338,6 +1365,7 @@ export default function App() {
       );
 
       setSentiment(result);
+      await loadSentimentHistory(selected);
     } catch (err) {
       setSentimentError(
         err.message || "Unable to load sentiment data."
@@ -1359,6 +1387,7 @@ export default function App() {
 
       const sentimentResult = await request("/api/news/sentiment");
       setSentiment(sentimentResult);
+          await loadSentimentHistory(selected);
 
       if (newsFilter === "company") {
         // Reload company-specific headlines using the existing effect.
@@ -1429,6 +1458,7 @@ export default function App() {
 
         if (active && sentimentResult) {
           setSentiment(sentimentResult);
+          await loadSentimentHistory(selected);
         }
       } catch (err) {
         if (active) {
@@ -2875,6 +2905,16 @@ export default function App() {
               </div>
             </>
           )}
+
+          <Suspense fallback={<p className="data-status">Loading sentiment history chart...</p>}>
+            <SentimentHistoryChart
+              selected={selected}
+              history={sentimentHistory}
+              loading={sentimentHistoryLoading}
+              error={sentimentHistoryError}
+              onRefresh={() => loadSentimentHistory(selected)}
+            />
+          </Suspense>
 
           <h3 style={{ marginTop: 24 }}>Latest Market Headlines</h3>
 
